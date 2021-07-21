@@ -336,8 +336,8 @@ gpiSendLogin(GPConnection * connection,
 	GPIConnection * iconnection = (GPIConnection*)*connection;
 	GPIProfile * profile;
 	char * passphrase;
-	char userBuffer[GP_NICK_LEN + GP_EMAIL_LEN];
 	char partnerBuffer[11];
+	char userBuffer[GP_NICK_LEN + GP_EMAIL_LEN + 1 + sizeof(partnerBuffer) / sizeof(partnerBuffer[0])];
 	char * user;
 
 	// Construct the user challenge.
@@ -710,7 +710,7 @@ gpiProcessConnect(
 			data->serverChallenge,
 			data->userChallenge,
 			data->passwordHash);
-		MD5Digest((unsigned char *)buffer, strlen(buffer), check);
+		GSMD5Digest((unsigned char *)buffer, strlen(buffer), check);
 
 		// Get the proof.
 		/////////////////

@@ -97,10 +97,10 @@ static GHTTPBool ghiParseURL
 	if(!*URL)
 		URL = "/";
 	connection->requestPath = goastrdup(URL);
+	if (!connection->requestPath)
+		return GHTTPFalse;
 	while((str = strchr(connection->requestPath, ' ')) != NULL)
 		*str = '+';
-	if(!connection->requestPath)
-		return GHTTPFalse;
 
 	return GHTTPTrue;
 }
@@ -1247,7 +1247,7 @@ static int ghiParseChunkSize
 {
 	char * header;
 	int len;
-	int num;
+	unsigned num;
 	int rcode;
 
 	header = connection->chunkHeader;
@@ -1257,10 +1257,10 @@ static int ghiParseChunkSize
 	GSI_UNUSED(len);
 
 	rcode = sscanf(header, "%x", &num);
-	if(rcode != 1)
+	if(rcode != 1 || num > INT_MAX)
 		return -1;
 
-	return num;
+	return (int)num;
 }
 
 // Appends the data to the chunk header buffer.
@@ -1725,7 +1725,10 @@ void ghiDoReceivingHeaders
                         connection->completed = GHTTPTrue;
                         connection->result = GHTTPOutOfMemory;
                     }
-                    sprintf(connection->redirectURL, "http://%s:%d%s", connection->serverAddress, connection->serverPort, location);
+                    else
+                    {
+                        sprintf(connection->redirectURL, "http://%s:%d%s", connection->serverAddress, connection->serverPort, location);
+                    }
                 }
                 else
                 {
@@ -1776,7 +1779,7 @@ void ghiDoReceivingHeaders
                 if( pEnd-pStart == nMaxLen )
                 {
                     // Same length, maybe a bigger number
-                    if( strncmp(pStart,szMaxSize,(unsigned int)(pEnd-pStart)) >= 0 )
+                    if( strncmp(pStart,szMaxSize,(size_t)(pEnd-pStart)) >= 0 )
                     {
                         connection->completed = GHTTPTrue;
                         connection->result = GHTTPFileToBig;

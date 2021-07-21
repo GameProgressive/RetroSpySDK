@@ -198,7 +198,7 @@ char *GenerateAuthA(const char *challenge, const char *password, char response[3
 	sprintf(rawout, "%s%s",password, challenge );
 
 	/* do the response md5 */
-	MD5Digest((unsigned char *)rawout, strlen(rawout), response);
+	GSMD5Digest((unsigned char *)rawout, strlen(rawout), response);
 	return response;
 }
 #ifdef GSI_UNICODE
@@ -215,7 +215,7 @@ char *GenerateAuthW(const char* challenge, const unsigned short *password, char 
 int InitStatsAsync(int theGamePort, gsi_time theInitTimeout)
 {
 	struct sockaddr_in saddr;
-	char tempHostname[128];
+	char tempHostname[sizeof(gcd_gamename)/sizeof(gcd_gamename[0])];
 	int  ret;
 		
 	gameport = theGamePort;
@@ -958,7 +958,7 @@ static int SendChallengeResponse(const char *indata, int gameport)
 {
 	static char challengestr[] = {'\0','h','a','l','l','e','n','g','e','\0'};
 	char *challenge;
-	char resp[128];
+	char resp[256];
 	char md5val[33];
 
 	/* make this harder to find in the string table */
@@ -976,7 +976,7 @@ static int SendChallengeResponse(const char *indata, int gameport)
 	
 	len = sprintf(resp, "%d%s",g_crc32(challenge,(int)strlen(challenge)), gcd_secret_key);
 	
-	MD5Digest((unsigned char *)resp, (unsigned int)len, md5val);
+	GSMD5Digest((unsigned char *)resp, (unsigned int)len, md5val);
 	DOXCODE(respformat, sizeof(respformat)-1, enc3);
 	len = sprintf(resp,respformat,gcd_gamename, md5val, gameport);
 	

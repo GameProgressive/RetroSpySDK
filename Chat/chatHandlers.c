@@ -99,7 +99,7 @@
 
 
 #define FINISH_FILTER          ciFinishFilter(chat, filter, &params)
-#define IS_ALPHA(c) ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z'))
+#define IS_ALPHA(c) (((c) >= 'A' && (c) <= 'Z') || ((c) >= 'a' && (c) <= 'z'))
 
 enum
 {
@@ -4307,7 +4307,7 @@ void ciErrNoSuchChannelHandler(CHAT chat, const ciServerMessage * message)
 
 	// Setup the filter matches.
 	////////////////////////////
-	memset(&matches, 0, sizeof(ciFilterMatch));
+	memset(&matches, 0, sizeof(matches));
 	matches[0].type = TYPE_JOIN;
 	matches[0].name = channel;
 	matches[1].type = TYPE_CMODE;
